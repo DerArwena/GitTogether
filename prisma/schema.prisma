@@ -37,6 +37,9 @@ model User {
   joinRequests JoinRequest[]
   createdInvites Invite[]       @relation("InviteCreator")
   reviewedRequests JoinRequest[] @relation("Reviewer")
+  apiKeys            ApiKey[]
+  notificationPref   NotificationPreference?
+  featureFlags       FeatureFlag[]
 }
 
 model Account {
@@ -91,6 +94,7 @@ model Project {
   linkedRepos  LinkedRepo[]
   invites      Invite[]
   joinRequests JoinRequest[]
+  featureFlags  FeatureFlag[]
 }
 
 model ProjectMember {
@@ -154,4 +158,44 @@ model JoinRequest {
 
   @@unique([projectId, userId])
   @@index([status])
+}
+
+model ApiKey {
+  id         String    @id @default(cuid())
+  name       String
+  key        String    @unique
+  userId     String
+  lastUsedAt DateTime?
+  createdAt  DateTime  @default(now())
+  expiresAt  DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([key])
+}
+
+model NotificationPreference {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  emailJoinRequests Boolean @default(true)
+  emailInvites      Boolean @default(true)
+  emailActivity     Boolean @default(false)
+  emailDigest       Boolean @default(false)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model FeatureFlag {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  name        String
+  description String?
+  enabled     Boolean  @default(false)
+  userId      String?
+  projectId   String?
+  createdAt   DateTime @default(now())
+
+  user    User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

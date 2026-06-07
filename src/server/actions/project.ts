@@ -6,13 +6,26 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    || "project";
+}
+
+async function uniqueSlug(base: string): Promise<string> {
+  let slug = base;
+  let attempt = 0;
+  while (await db.project.findUnique({ where: { slug } })) {
+    attempt++;
+    slug = `${base}-${attempt}`;
+  }
+  return slug;
+}
+
 const createProjectSchema = z.object({
   name: z.string().min(1).max(64),
-  slug: z
-    .string()
-    .min(1)
-    .max(64)
-    .regex(/^[a-z0-9-]+$/, "Slug must be lowercase, numbers, and hyphens only"),
   description: z.string().max(500).optional(),
   websiteUrl: z.string().url().max(500).optional().or(z.literal("")),
   isPublic: z.boolean().optional().default(true),
@@ -22,17 +35,22 @@ export async function createProject(formData: FormData) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("Unauthorized");
 
+  const rawName = formData.get("name") as string | null;
+
   const parsed = createProjectSchema.parse({
-    name: formData.get("name"),
-    slug: formData.get("slug"),
+    name: rawName,
     description: formData.get("description") || undefined,
     websiteUrl: formData.get("websiteUrl") || undefined,
     isPublic: formData.get("isPublic") === "true",
   });
 
+  const slug = slugify(parsed.name);
+  const finalSlug = await uniqueSlug(slug);
+
   const project = await db.project.create({
     data: {
       ...parsed,
+      slug: finalSlug,
       ownerId: session.user.id,
       members: {
         create: {
