@@ -15,6 +15,9 @@ import {
   GitPullRequest,
   GitFork,
   Users,
+  LayoutList,
+  MessageSquareText,
+  CheckSquare,
 } from "lucide-react";
 import { useState } from "react";
 
@@ -30,6 +33,7 @@ const navGroups = [
     section: "Development",
     items: [
       { label: "Projects", href: "/projects", icon: FolderKanban },
+      { label: "Tasks", href: "/projects", icon: CheckSquare },
       { label: "Repositories", href: "/repositories", icon: GitFork },
       { label: "Pull Requests", href: "/pulls", icon: GitPullRequest },
     ],
@@ -37,6 +41,7 @@ const navGroups = [
   {
     section: "Workspace",
     items: [
+      { label: "Chat", href: "/chat", icon: MessageSquareText },
       { label: "Team", href: "/team", icon: Users },
       { label: "Analytics", href: "/analytics", icon: BarChart3 },
     ],
@@ -57,6 +62,7 @@ export function Sidebar() {
   function isActive(href: string) {
     if (href === "/dashboard") return pathname === "/dashboard";
     if (href === "/activity") return pathname === "/activity";
+    if (href === "/chat") return pathname === "/chat" || pathname.includes("/chat");
     if (href === "/repositories") return pathname === "/repositories";
     if (href === "/pulls") return pathname === "/pulls";
     if (href === "/team") return pathname === "/team";

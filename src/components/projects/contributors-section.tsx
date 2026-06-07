@@ -35,6 +35,7 @@ export async function ContributorsSection({ projectId }: Props) {
   const totalCommits = allContributors.reduce((s, c) => s + c.commits, 0);
   const totalAdditions = allContributors.reduce((s, c) => s + c.additions, 0);
   const totalDeletions = allContributors.reduce((s, c) => s + c.deletions, 0);
+  const hasDiffs = totalAdditions > 0 || totalDeletions > 0;
 
   const contributorMap = new Map<string, { login: string; avatarUrl: string; htmlUrl: string; commits: number; additions: number; deletions: number; repos: Set<string> }>();
   for (const c of allContributors) {
@@ -69,14 +70,18 @@ export async function ContributorsSection({ projectId }: Props) {
           <div className="text-lg font-bold tracking-tight">{totalCommits.toLocaleString()}</div>
           <div className="text-[11px] text-muted-foreground mt-0.5">Commits</div>
         </div>
-        <div className="rounded-xl border border-border bg-card p-3.5 text-center">
-          <div className="text-lg font-bold tracking-tight text-emerald-500">+{totalAdditions.toLocaleString()}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Additions</div>
-        </div>
-        <div className="rounded-xl border border-border bg-card p-3.5 text-center">
-          <div className="text-lg font-bold tracking-tight text-red-500">-{totalDeletions.toLocaleString()}</div>
-          <div className="text-[11px] text-muted-foreground mt-0.5">Deletions</div>
-        </div>
+        {hasDiffs && (
+          <>
+            <div className="rounded-xl border border-border bg-card p-3.5 text-center">
+              <div className="text-lg font-bold tracking-tight text-emerald-500">+{totalAdditions.toLocaleString()}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Additions</div>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-3.5 text-center">
+              <div className="text-lg font-bold tracking-tight text-red-500">-{totalDeletions.toLocaleString()}</div>
+              <div className="text-[11px] text-muted-foreground mt-0.5">Deletions</div>
+            </div>
+          </>
+        )}
       </div>
 
       <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -105,8 +110,12 @@ export async function ContributorsSection({ projectId }: Props) {
               </div>
               <div className="flex items-center gap-4 text-xs tabular-nums">
                 <span className="text-muted-foreground">{c.commits} commits</span>
-                <span className="text-emerald-500 w-14 text-right">+{c.additions.toLocaleString()}</span>
-                <span className="text-red-500 w-14 text-right">-{c.deletions.toLocaleString()}</span>
+                {hasDiffs && (
+                  <>
+                    <span className="text-emerald-500 w-14 text-right">+{c.additions.toLocaleString()}</span>
+                    <span className="text-red-500 w-14 text-right">-{c.deletions.toLocaleString()}</span>
+                  </>
+                )}
               </div>
               <ExternalLink className="size-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </a>

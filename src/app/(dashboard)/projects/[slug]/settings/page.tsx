@@ -38,7 +38,7 @@ export default async function ProjectSettingsPage({
   }
 
   return (
-    <div className="p-6 lg:p-8 max-w-2xl">
+    <div className="p-6 lg:p-8">
       <div className="flex items-center gap-4 mb-8">
         <Link href={`/projects/${slug}`}>
           <Button variant="ghost" size="icon" className="size-8">

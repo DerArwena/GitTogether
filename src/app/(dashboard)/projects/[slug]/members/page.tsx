@@ -43,7 +43,7 @@ export default async function ProjectMembersPage({
   const canManage = currentMember?.role && ["owner", "admin"].includes(currentMember.role);
 
   return (
-    <div className="p-6 lg:p-8 max-w-3xl">
+    <div className="p-6 lg:p-8">
       <div className="flex items-center gap-4 mb-8">
         <Link href={`/projects/${slug}`}>
           <Button variant="ghost" size="icon" className="size-8">
