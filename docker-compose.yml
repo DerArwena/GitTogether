@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: gittogether
+      POSTGRES_PASSWORD: gittogether
+      POSTGRES_DB: gittogether
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gittogether"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      DATABASE_URL: "postgresql://gittogether:gittogether@db:5432/gittogether?schema=public"
+      AUTH_SECRET: "${AUTH_SECRET:-change-me-in-production}"
+      AUTH_URL: "http://localhost:3000"
+      AUTH_GITHUB_ID: "${AUTH_GITHUB_ID}"
+      AUTH_GITHUB_SECRET: "${AUTH_GITHUB_SECRET}"
+      AUTH_GOOGLE_ID: "${AUTH_GOOGLE_ID}"
+      AUTH_GOOGLE_SECRET: "${AUTH_GOOGLE_SECRET}"
+      EMAIL_SERVER: "${EMAIL_SERVER}"
+      EMAIL_FROM: "${EMAIL_FROM}"
+      APP_INVITE_ONLY: "${APP_INVITE_ONLY:-true}"
+      APP_NAME: "GitTogether"
+      NEXT_PUBLIC_APP_URL: "http://localhost:3000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

@@ -1,0 +1,157 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum Role {
+  owner
+  admin
+  maintainer
+  member
+  viewer
+}
+
+enum JoinRequestStatus {
+  pending
+  approved
+  denied
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts     Account[]
+  sessions     Session[]
+  ownedProjects Project[]       @relation("ProjectOwner")
+  memberships  ProjectMember[]
+  joinRequests JoinRequest[]
+  createdInvites Invite[]       @relation("InviteCreator")
+  reviewedRequests JoinRequest[] @relation("Reviewer")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Project {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  description String?
+  logoUrl     String?
+  websiteUrl  String?
+  isPublic    Boolean  @default(true)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner        User            @relation("ProjectOwner", fields: [ownerId], references: [id])
+  members      ProjectMember[]
+  linkedRepos  LinkedRepo[]
+  invites      Invite[]
+  joinRequests JoinRequest[]
+}
+
+model ProjectMember {
+  id        String   @id @default(cuid())
+  projectId String
+  userId    String
+  role      Role     @default(member)
+  createdAt DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, userId])
+}
+
+model LinkedRepo {
+  id             String   @id @default(cuid())
+  projectId      String
+  githubRepoId   BigInt
+  githubRepoName String
+  githubRepoUrl  String
+  defaultBranch  String   @default("main")
+  createdAt      DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, githubRepoId])
+  @@index([githubRepoId])
+}
+
+model Invite {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  projectId   String
+  role        Role     @default(member)
+  maxUses     Int?
+  usedCount   Int      @default(0)
+  expiresAt   DateTime?
+  createdById String
+  createdAt   DateTime @default(now())
+
+  project Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  creator User    @relation("InviteCreator", fields: [createdById], references: [id])
+
+  @@index([code])
+}
+
+model JoinRequest {
+  id           String            @id @default(cuid())
+  projectId    String
+  userId       String
+  status       JoinRequestStatus @default(pending)
+  message      String?
+  reviewedById String?
+  createdAt    DateTime          @default(now())
+  reviewedAt   DateTime?
+
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User?   @relation("Reviewer", fields: [reviewedById], references: [id])
+
+  @@unique([projectId, userId])
+  @@index([status])
+}

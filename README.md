@@ -1,36 +1,40 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# GitTogether
 
-## Getting Started
+**Project HQ for your GitHub repositories.**
 
-First, run the development server:
+GitTogether gives every GitHub project a dedicated hub — manage your team, see your issues across repos, and control who has access.
+
+## Features
+
+- **Project profiles** — A home page for each project with description, links, repos, and team
+- **Member management** — Five roles (owner → viewer) with clear permissions
+- **Issue aggregation** — See open issues from all linked repos in one feed
+- **Invite system** — Share invite links with role assignment and expiration
+- **Join requests** — Let people request access to your projects
+- **Self-hostable** — One `docker compose up` to run your own instance
+- **Invite-only mode** — Control who can register on hosted or self-hosted versions
+
+## Quick start
 
 ```bash
+git clone https://github.com/YOUR_ORG/gittogether
+cd gittogether
+npm install
+npx prisma generate
+npx prisma db push
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+See [docs/self-hosting.md](docs/self-hosting.md) for production deployment.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Tech stack
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Next.js 16 · TypeScript · Tailwind CSS · shadcn/ui · PostgreSQL · Prisma · Auth.js · Docker
 
-## Learn More
+## License
 
-To learn more about Next.js, take a look at the following resources:
+MIT — see [LICENSE](LICENSE).
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Contributing
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
