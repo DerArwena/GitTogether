@@ -22,21 +22,26 @@ export default async function NotificationsPage() {
   };
 
   return (
-    <div className="p-6 max-w-lg">
+    <div className="p-6 lg:p-8 max-w-lg">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/settings">
-          <Button variant="ghost" size="icon" className="size-8">
+          <Button variant="ghost" size="icon" className="size-8 rounded-lg">
             <ArrowLeft className="size-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Notifications</h1>
+          <h1 className="text-xl font-bold tracking-tight">Notifications</h1>
           <p className="text-sm text-muted-foreground">Notification preferences</p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-background p-5">
-        <h3 className="text-sm font-semibold mb-4">Email notifications</h3>
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center gap-2 mb-5">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-chart-1/10">
+            <Bell className="size-4 text-chart-1" />
+          </div>
+          <h3 className="text-sm font-semibold">Email notifications</h3>
+        </div>
         <NotificationToggles prefs={prefs ?? defaults} />
       </div>
     </div>

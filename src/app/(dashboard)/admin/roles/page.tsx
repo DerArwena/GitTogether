@@ -1,6 +1,6 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Shield, ShieldCheck, ShieldOff } from "lucide-react";
+import { ArrowLeft, Shield, ShieldCheck, ShieldOff, Eye, Users, Settings, Key } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,20 +13,40 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 
-const roleDescriptions: Record<string, { icon: any; description: string }> = {
-  owner: { icon: ShieldCheck, description: "Full control over the project" },
-  admin: { icon: Shield, description: "Manage members and settings" },
-  maintainer: { icon: Shield, description: "Manage repos and invites" },
-  member: { icon: Shield, description: "View and participate" },
-  viewer: { icon: ShieldOff, description: "Read-only access" },
-};
+const roles = [
+  {
+    role: "owner", icon: ShieldCheck, level: 4,
+    description: "Full control over the project",
+    permissions: ["Delete project", "Transfer ownership", "Manage all settings"],
+  },
+  {
+    role: "admin", icon: Shield, level: 3,
+    description: "Manage members and settings",
+    permissions: ["Manage members", "Project settings", "Manage invites", "Link repos"],
+  },
+  {
+    role: "maintainer", icon: Settings, level: 2,
+    description: "Manage repos and invites",
+    permissions: ["Link/unlink repos", "Create invites", "View analytics"],
+  },
+  {
+    role: "member", icon: Users, level: 1,
+    description: "View and participate",
+    permissions: ["View project", "View issues", "View members"],
+  },
+  {
+    role: "viewer", icon: Eye, level: 0,
+    description: "Read-only access",
+    permissions: ["View project (read-only)"],
+  },
+];
 
 export default async function RolesPage() {
   const session = await auth();
   if (!session?.user) redirect("/auth/signin");
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 lg:p-8 space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/admin">
           <Button variant="ghost" size="icon" className="size-8">
@@ -34,12 +54,12 @@ export default async function RolesPage() {
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Roles & permissions</h1>
+          <h1 className="text-xl font-bold tracking-tight">Roles & permissions</h1>
           <p className="text-sm text-muted-foreground">Predefined roles for project access control</p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-background overflow-hidden">
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow>
@@ -50,24 +70,32 @@ export default async function RolesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {Object.entries(roleDescriptions).map(([role, { icon: Icon, description }], i) => (
+            {roles.map(({ role, icon: Icon, level, description, permissions }, i) => (
               <TableRow key={role}>
                 <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Icon className="size-4 text-muted-foreground" />
+                  <div className="flex items-center gap-2.5">
+                    <div className={`flex size-7 items-center justify-center rounded-lg ${
+                      i === 0 ? "bg-chart-1/10 text-chart-1" :
+                      i === 1 ? "bg-chart-2/10 text-chart-2" :
+                      "bg-muted text-muted-foreground"
+                    }`}>
+                      <Icon className="size-3.5" />
+                    </div>
                     <span className="font-medium capitalize">{role}</span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant="outline">{i}</Badge>
+                  <Badge variant="outline" className="rounded-md font-mono">{level}</Badge>
                 </TableCell>
-                <TableCell className="text-muted-foreground">{description}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">
-                  {role === "owner" && "Delete, transfer, manage all"}
-                  {role === "admin" && "Members, settings, invites"}
-                  {role === "maintainer" && "Repos, invites, issues"}
-                  {role === "member" && "View projects, issues, members"}
-                  {role === "viewer" && "Read-only access"}
+                <TableCell className="text-muted-foreground text-sm">{description}</TableCell>
+                <TableCell>
+                  <div className="flex flex-wrap gap-1">
+                    {permissions.map((p) => (
+                      <span key={p} className="text-[10px] bg-muted px-1.5 py-0.5 rounded-md text-muted-foreground">
+                        {p}
+                      </span>
+                    ))}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}

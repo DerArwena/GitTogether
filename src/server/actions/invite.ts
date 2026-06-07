@@ -23,9 +23,10 @@ export async function createInvite(projectId: string, formData: FormData) {
     throw new Error("Forbidden");
   }
 
+  type ValidRole = "owner" | "admin" | "maintainer" | "member" | "viewer";
+  const validRoles: ValidRole[] = ["owner", "admin", "maintainer", "member", "viewer"];
   const roleValue = formData.get("role") as string;
-  const validRoles = ["owner", "admin", "maintainer", "member", "viewer"] as const;
-  const role = validRoles.includes(roleValue as any) ? (roleValue as any) : "member";
+  const role: ValidRole = validRoles.includes(roleValue as ValidRole) ? (roleValue as ValidRole) : "member";
 
   await db.invite.create({
     data: {

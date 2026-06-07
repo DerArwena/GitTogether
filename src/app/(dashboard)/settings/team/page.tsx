@@ -35,46 +35,52 @@ export default async function TeamSettingsPage() {
   }
 
   return (
-    <div className="p-6 max-w-2xl">
+    <div className="p-6 lg:p-8 max-w-2xl">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/settings">
-          <Button variant="ghost" size="icon" className="size-8">
+          <Button variant="ghost" size="icon" className="size-8 rounded-lg">
             <ArrowLeft className="size-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Team</h1>
+          <h1 className="text-xl font-bold tracking-tight">Team</h1>
           <p className="text-sm text-muted-foreground">People you collaborate with</p>
         </div>
       </div>
 
-      {uniqueUsers.size === 0 ? (
-        <div className="rounded-lg border border-dashed border-border p-8 text-center">
-          <Users className="size-8 mx-auto text-muted-foreground mb-3" />
-          <p className="text-sm text-muted-foreground">No team members yet. Create or join a project first.</p>
-        </div>
-      ) : (
-        <div className="rounded-lg border border-border bg-background divide-y divide-border">
-          {Array.from(uniqueUsers.entries()).map(([id, user]) => (
-            <div key={id} className="flex items-center gap-3 p-3">
-              <div className="flex size-8 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                {user.name?.[0] ?? user.email?.[0] ?? "?"}
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user.name ?? "Unknown"}</p>
-                <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
-                  <Mail className="size-3" />
-                  {user.email}
-                </p>
-              </div>
-              <div className="text-xs text-muted-foreground text-right">
-                <p>{user.projects.length} project{user.projects.length !== 1 ? "s" : ""}</p>
-                <p className="truncate max-w-32">{user.projects.join(", ")}</p>
+      <div className="rounded-xl border border-border bg-card overflow-hidden">
+        {uniqueUsers.size === 0 ? (
+          <div className="p-8 text-center">
+            <div className="flex justify-center mb-3">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-muted">
+                <Users className="size-5 text-muted-foreground" />
               </div>
             </div>
-          ))}
-        </div>
-      )}
+            <p className="text-sm text-muted-foreground">No team members yet. Create or join a project first.</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {Array.from(uniqueUsers.entries()).map(([id, user]) => (
+              <div key={id} className="flex items-center gap-3 p-4 hover:bg-accent/30 transition-colors">
+                <div className="flex size-9 items-center justify-center rounded-lg bg-muted text-sm font-medium text-muted-foreground">
+                  {user.name?.[0] ?? user.email?.[0] ?? "?"}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{user.name ?? "Unknown"}</p>
+                  <p className="text-xs text-muted-foreground truncate flex items-center gap-1">
+                    <Mail className="size-3" />
+                    {user.email}
+                  </p>
+                </div>
+                <div className="text-right">
+                  <p className="text-sm font-medium">{user.projects.length}</p>
+                  <p className="text-xs text-muted-foreground">project{user.projects.length !== 1 ? "s" : ""}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

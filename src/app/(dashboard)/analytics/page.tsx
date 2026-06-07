@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
 import { Users, Activity, BarChart3, GitCommit } from "lucide-react";
+import { PageHeader } from "@/components/layout/page-header";
 import { MembersBarChart } from "@/components/charts/members-bar-chart";
 import { ReposPieChart } from "@/components/charts/repos-pie-chart";
 
@@ -37,53 +38,37 @@ export default async function AnalyticsPage() {
     }));
 
   return (
-    <div className="p-6 space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Analytics</h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-      Overview of your workspace activity and growth.
-        </p>
-      </div>
+    <div className="p-6 lg:p-8 space-y-8">
+      <PageHeader
+        title="Analytics"
+        description="Overview of your workspace activity and growth."
+      />
 
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <BarChart3 className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Projects</span>
+      <div className="grid gap-3 sm:grid-cols-4">
+        {[
+          { label: "Projects", value: totalProjects, icon: BarChart3 },
+          { label: "Members", value: totalMembers, icon: Users },
+          { label: "Repos", value: totalRepos, icon: GitCommit },
+          { label: "Avg size", value: totalProjects > 0 ? (totalMembers / totalProjects).toFixed(1) : "—", icon: Activity },
+        ].map(({ label, value, icon: Icon }) => (
+          <div key={label} className="rounded-lg border border-border bg-card p-4">
+            <div className="flex items-center gap-2 mb-1.5">
+              <div className="flex size-6 items-center justify-center rounded bg-muted">
+                <Icon className="size-3 text-muted-foreground" />
+              </div>
+              <span className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider">{label}</span>
+            </div>
+            <p className="text-2xl font-semibold tracking-tight">{value}</p>
           </div>
-          <p className="text-2xl font-semibold">{totalProjects}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Users className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Members</span>
-          </div>
-          <p className="text-2xl font-semibold">{totalMembers}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <GitCommit className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Repos</span>
-          </div>
-          <p className="text-2xl font-semibold">{totalRepos}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <Activity className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Avg size</span>
-          </div>
-          <p className="text-2xl font-semibold">
-            {totalProjects > 0 ? (totalMembers / totalProjects).toFixed(1) : "—"}
-          </p>
-        </div>
+        ))}
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-lg border border-border bg-background p-5">
+        <div className="rounded-lg border border-border bg-card p-5">
           <h3 className="text-sm font-semibold mb-4">Members per project</h3>
           <MembersBarChart data={barData} />
         </div>
-        <div className="rounded-lg border border-border bg-background p-5">
+        <div className="rounded-lg border border-border bg-card p-5">
           <h3 className="text-sm font-semibold mb-4">Repository distribution</h3>
           <ReposPieChart data={pieData} />
         </div>

@@ -16,23 +16,28 @@ export default async function FeaturesPage() {
   });
 
   return (
-    <div className="p-6 max-w-lg">
+    <div className="p-6 lg:p-8 max-w-lg">
       <div className="flex items-center gap-4 mb-8">
         <Link href="/settings">
-          <Button variant="ghost" size="icon" className="size-8">
+          <Button variant="ghost" size="icon" className="size-8 rounded-lg">
             <ArrowLeft className="size-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Features</h1>
+          <h1 className="text-xl font-bold tracking-tight">Features</h1>
           <p className="text-sm text-muted-foreground">Feature toggles and preferences</p>
         </div>
       </div>
 
-      <div className="rounded-lg border border-border bg-background p-5 mb-4">
-        <h3 className="text-sm font-semibold mb-3">Feature flags</h3>
+      <div className="rounded-xl border border-border bg-card p-5">
+        <div className="flex items-center gap-2 mb-4">
+          <div className="flex size-8 items-center justify-center rounded-lg bg-chart-4/10">
+            <ToggleLeft className="size-4 text-chart-4" />
+          </div>
+          <h3 className="text-sm font-semibold">Feature flags</h3>
+        </div>
         {flags.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {flags.map((flag) => (
               <FeatureToggle key={flag.id} flag={flag} />
             ))}
@@ -40,10 +45,10 @@ export default async function FeaturesPage() {
         ) : (
           <div className="text-center py-6">
             <ToggleLeft className="size-8 mx-auto text-muted-foreground mb-3" />
-            <p className="text-sm text-muted-foreground mb-3">No feature flags yet.</p>
+            <p className="text-sm text-muted-foreground mb-4">No feature flags yet.</p>
             <form action={seedFeatureFlags}>
-              <Button type="submit" size="sm" variant="outline">
-                <RefreshCw className="size-3.5 mr-1.5" />
+              <Button type="submit" size="sm" variant="outline" className="gap-1.5">
+                <RefreshCw className="size-3.5" />
                 Load defaults
               </Button>
             </form>

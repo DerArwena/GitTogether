@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { db } from "@/lib/db";
-import { TrendingUp, ArrowLeft } from "lucide-react";
+import { TrendingUp, ArrowLeft, BarChart3, Users, GitCommit } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { GrowthLineChart } from "@/components/charts/growth-line-chart";
@@ -78,49 +78,42 @@ export default async function GrowthPage() {
 
   const growthData = await buildGrowthData(session.user.id);
 
+  const stats = [
+    { label: "Projects", value: memberships.length, icon: BarChart3, color: "from-chart-1/20 to-chart-1/5", iconColor: "text-chart-1" },
+    { label: "Members", value: memberships.reduce((s, m) => s + m.project._count.members, 0), icon: Users, color: "from-chart-2/20 to-chart-2/5", iconColor: "text-chart-2" },
+    { label: "Repos", value: memberships.reduce((s, m) => s + m.project._count.linkedRepos, 0), icon: GitCommit, color: "from-chart-3/20 to-chart-3/5", iconColor: "text-chart-3" },
+  ];
+
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 lg:p-8 space-y-6">
       <div className="flex items-center gap-4">
         <Link href="/analytics">
-          <Button variant="ghost" size="icon" className="size-8">
+          <Button variant="ghost" size="icon" className="size-8 rounded-lg">
             <ArrowLeft className="size-4" />
           </Button>
         </Link>
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">Growth</h1>
+          <h1 className="text-xl font-bold tracking-tight">Growth</h1>
           <p className="text-sm text-muted-foreground">Growth metrics over time</p>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <TrendingUp className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Projects</span>
+        {stats.map(({ label, value, icon: Icon, color, iconColor }) => (
+          <div key={label} className="relative rounded-xl border border-border bg-card p-5 overflow-hidden">
+            <div className={`absolute inset-0 bg-gradient-to-br ${color}`} />
+            <div className="relative">
+              <div className="flex items-center gap-2 text-muted-foreground mb-1.5">
+                <Icon className={`size-4 ${iconColor}`} />
+                <span className="text-xs font-semibold uppercase tracking-wider">{label}</span>
+              </div>
+              <p className="text-3xl font-bold tracking-tight">{value}</p>
+            </div>
           </div>
-          <p className="text-2xl font-semibold">{memberships.length}</p>
-        </div>
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <TrendingUp className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Total members</span>
-          </div>
-          <p className="text-2xl font-semibold">
-            {memberships.reduce((s, m) => s + m.project._count.members, 0)}
-          </p>
-        </div>
-        <div className="rounded-lg border border-border bg-background p-5">
-          <div className="flex items-center gap-2 text-muted-foreground mb-1">
-            <TrendingUp className="size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">Total repos</span>
-          </div>
-          <p className="text-2xl font-semibold">
-            {memberships.reduce((s, m) => s + m.project._count.linkedRepos, 0)}
-          </p>
-        </div>
+        ))}
       </div>
 
-      <div className="rounded-lg border border-border bg-background p-5">
+      <div className="rounded-xl border border-border bg-card p-5">
         <h3 className="text-sm font-semibold mb-4">Cumulative growth over time</h3>
         <GrowthLineChart data={growthData} />
       </div>

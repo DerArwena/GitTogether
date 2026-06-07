@@ -8,7 +8,11 @@ import { db } from "@/lib/db";
 export const { handlers, signIn, signOut, auth } = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [
-    GitHub,
+    GitHub({
+      authorization: {
+        params: { scope: "read:user user:email repo" },
+      },
+    }),
     Google,
     Email({ server: process.env.EMAIL_SERVER, from: process.env.EMAIL_FROM }),
   ],
@@ -17,7 +21,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
     error: "/auth/error",
   },
   callbacks: {
-    session({ session, user }) {
+    async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
       }
